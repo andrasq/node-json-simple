@@ -2,8 +2,8 @@ json-simple
 ===========
 
 Fast JSON encoder.  Handles a simplified subset of the input accepted by
-JSON.stringify, but runs 2x faster.  Intended for encoding data for export,
-not native object serialization.
+JSON.stringify, but runs 2x faster.  Ideal for encoding data for export,
+won't work for arbitrary object serialization.
 
 Data exchange formats are simple; they tend to be plain arrays or hashes with
 no inherited properties, simple ascii property names, containing fairly simple
@@ -16,12 +16,38 @@ Nested arrays and nested objects work too.
 Outputs a `JSON.parse` compatible string.
 
 
+        json = require('json-simple');
+        var data = [0, "one", {two: 2}];
+        var str = json.encode(data);            // => [0,"one",{"two":2}]
+        json.decode(str);                       // => data
+        JSON.parse(str);                        // => data
+        
+
 Installation
 ------------
 
         npm install json-simple
 
         npm test json-simple
+
+
+Methods
+-------
+
+### encode( data )
+
+Convert the data into a json string.  Converts arrays, objects, numbers,
+strings and special values (see Supported Types below).
+
+        json = require('json-simple');
+        json.encode({a:1, b:"two"});
+
+### decode( string )
+
+Parse the json string into the corresponding native data item.
+
+        json = require('json-simple');
+        json.decode('{"a":1,"b":"two"}');
 
 
 Supported Types
