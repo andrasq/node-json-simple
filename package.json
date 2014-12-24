@@ -1,0 +1,33 @@
+{
+  "name": "json-simple",
+  "version": "0.9.0",
+  "description": "fast nodejs json encoder",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/andrasq/node-json-simple"
+  },
+  "main": "index.js",
+  "author": {
+    "name": "Andras",
+    "url": "http://github.com/andrasq"
+  },
+  "engines": {
+    "node": "*"
+  },
+  "scripts": {
+    "test": "nodeunit"
+  },
+  "keywords": [
+    "Andras",
+    "fast",
+    "json",
+    "encode",
+    "stringify"
+  ],
+  "dependencies": {
+  },
+  "devDependencies": {
+    "nodeunit": "*"
+  }
+}
