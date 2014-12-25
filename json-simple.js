@@ -10,11 +10,15 @@ module.exports.decode = JsonSimple_decode;
 
 function json_string(s) {
     var i, len = s.length;
+    // JSON encodes long strings faster than we can test them
+    if (len > 100) return JSON.stringify(s);
+    // regex is slower in tight loops than explicit range testing
+    // table lookup is slower than explicit range testing
     for (i=0; i<len; i++) {
         var code = s.charCodeAt(i);
         if (code < 0x20 || code >= 127 || code === 0x5c || code === 0x22) return JSON.stringify(s);
     }
-    // plain ascii strings without backslashes are encoded as-is
+    // plain ascii strings without quotes or backslashes are encoded as-is
     return '"' + s + '"';
 }
 
