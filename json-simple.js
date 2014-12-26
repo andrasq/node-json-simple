@@ -1,5 +1,10 @@
-/*
- * JsonSimple encodes only a subset of js objects, but is 80-95% faster than JSON.stringify
+/**
+ * A quicker way to encode js objects for export.  The speedup is mostly
+ * from optimizing ascii strings and not handling non-ascii hash keys.
+ * The result is 80-95% faster than JSON.stringify.
+ *
+ * Copyright (C) 2014 Andras Radics
+ * Licensed under the Apache License, Version 2.0
  */
 
 'use strict';
@@ -11,7 +16,7 @@ module.exports.decode = JsonSimple_decode;
 function json_string(s) {
     var i, len = s.length;
     // JSON encodes long strings faster than we can test them
-    if (len > 100) return JSON.stringify(s);
+    if (len > 75) return JSON.stringify(s);
     // regex is slower in tight loops than explicit range testing
     // table lookup is slower than explicit range testing
     for (i=0; i<len; i++) {
