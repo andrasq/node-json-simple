@@ -36,6 +36,12 @@ module.exports = {
         t.done();
     },
 
+    'encodes arrays': function(t) {
+        var a = [1, 2.5, "three", [4], null, undefined, 0, false, true, {a: 123}];
+        t.equal(JSON.stringify(a), this.cut.encode(a));
+        t.done();
+    },
+
     'encodes complex arrays': function(t) {
         var data = [[1, 2, {x:1}], {a: 3, b: 4, c: [5,6,7]}];
         var json = this.cut.encode(data);
@@ -46,6 +52,12 @@ module.exports = {
     'encodes array-like object as array': function(t) {
         // omit for now
         // t.equal(this.cut.encode({length: 1, '0': 1}), "[1]");
+        t.done();
+    },
+
+    'encodes objects': function(t) {
+        var o = {a:1, b:2.5, c:"three", d:[4], e:null, f:undefined, g:0, h:false, i:true, j:{a: 123}};
+        t.equal(JSON.stringify(o), this.cut.encode(o));
         t.done();
     },
 
