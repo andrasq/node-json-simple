@@ -86,4 +86,69 @@ module.exports = {
         t.deepEqual(a, data);
         t.done();
     },
+
+    'test encode 100k datapoints speed': function(t) {
+        var data = {
+            t: 1234567890,
+            k: "measured-attribute-name",
+            v: 1234.567,
+        };
+        var i, x;
+        for (i=0; i<100000; i++) x = this.cut.encode(data);
+        // for (i=0; i<100000; i++) x = JSON.stringify(data);
+        // 67ms json-simple for 15B string, 119ms JSON.stringify (77%), 63ms for float (88%) (1.5m/s)
+        t.done();
+    },
+
+    'test encode 10k loglines speed': function(t) {
+        var data = {
+              "name" : "MyApp",
+              "hostname" : "server",
+              "pid" : 22467,
+              "audit" : true,
+              "level" : "info",
+              "remoteAddress" : "127.0.0.1",
+              "remotePort" : 58539,
+              "req_id" : "-",
+              "req" : {
+                "method" : "GET",
+                "url" : "/healthcheck",
+                "headers" : {
+                  "host" : "localhost:8888"
+                },
+                "httpVersion" : "1.1",
+                "trailers" : {
+                },
+                "version" : "1.0.0",
+                "timers" : {
+                }
+              },
+              "res" : {
+                "statusCode" : 200,
+                "trailer" : false
+              },
+              "rusage" : {
+                "utime" : 0,
+                "stime" : 0,
+                "wtime" : 0.00018252001609653234,
+                "maxrss" : 0,
+                "inblock" : 0,
+                "oublock" : 0
+              },
+              "query" : null,
+              "latency" : null,
+              "_audit" : true,
+              "msg" : "handled: 200",
+              "time" : "2015-01-15T05:04:55.114Z",
+              "v" : 0,
+              "requestId" : "-"
+        };
+        var i, x;
+        for (i=0; i<10000; i++) x = this.cut.encode(data);
+        //for (i=0; i<10000; i++) x = JSON.stringify(data);
+        // 75ms for 10k encodes of 533B strings: 133k/s (vs JSON.stringify 103ms)
+        // in production, throughput drops from 4.0k/s to 3.2k/s, ie 3.2k in .2 sec => 16k/s ?? (135k/s)
+        // both JSON and json-simple, same thing
+        t.done();
+    },
 };
