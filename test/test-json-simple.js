@@ -15,7 +15,7 @@ module.exports = {
         function tryit(value) {
             var c = self.cut.encode(value);
             var j = JSON.stringify(value);
-            t.equal(c, j, value + ": wrong encoded value " + c + ", expected " + j);
+            t.deepEqual(c, j, value + ": wrong encoded value " + c + ", expected " + j);
         }
         tryit("Hello, world.\n\u0007");
         tryit(123);
@@ -33,6 +33,16 @@ module.exports = {
         tryit([1, null, 2]);
         tryit(NaN);
         tryit(Infinity);
+
+        // corner cases: undefined should be skipped
+        tryit({u: undefined, a: 1, b: 2})
+        tryit({a: 1, u: undefined, b: 2})
+        tryit({a: 1, b: 2, u: undefined})
+        // functions should be skipped
+        tryit({u: function(){}, a: 1, b: 2})
+        tryit({a: 1, u: function(){}, b: 2})
+        tryit({a: 1, b: 2, u: function(){}})
+
         t.done();
     },
 
