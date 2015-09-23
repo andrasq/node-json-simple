@@ -1,1 +1,1 @@
-module.exports = require('./json-simple.js');
+module.exports = require('./lib/json-simple.js');
