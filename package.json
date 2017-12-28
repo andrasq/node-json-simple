@@ -1,6 +1,6 @@
 {
   "name": "json-simple",
-  "version": "0.9.6",
+  "version": "0.9.7",
   "description": "fast nodejs json encoder",
   "license": "Apache-2.0",
   "repository": {
