@@ -16,7 +16,9 @@
     "node": "*"
   },
   "scripts": {
-    "test": "nodeunit"
+    "test": "qnit",
+    "coverage": "nyc --reporter lcov --reporter text --include lib npm test",
+    "clean": "rm -rf .nyc_output coverage"
   },
   "keywords": [
     "Andras",
@@ -28,6 +30,6 @@
   "dependencies": {
   },
   "devDependencies": {
-    "nodeunit": "*"
+    "qnit": "*"
   }
 }

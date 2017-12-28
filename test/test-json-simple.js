@@ -22,9 +22,14 @@ module.exports = {
         tryit(123.456);
         tryit({a: 123, b: "test"});
         tryit([1, 2, "test"]);
-        // NOTE: array-like objects encode as array not object:
-        // (function args(){ tryit(arguments); })(1, 2.34, "test arguments");
-        tryit(new Buffer("Hello"));
+
+        // array-like objects encode as array not object:
+        (function args(){
+            t.deepEqual(self.cut.encode(arguments), '[1,2.34,"test arguments"]')
+        })(1, 2.34, "test arguments");
+        // we encode Buffer as an array like node-v0.10 did, newer node encodes it as `{ type:'Buffer', data: [...] }`
+        t.deepEqual(self.cut.encode(new Buffer("hello")), "[104,101,108,108,111]");
+
         tryit(undefined);
         tryit({a: undefined});
         tryit([1, undefined, 2]);
@@ -46,14 +51,26 @@ module.exports = {
         t.done();
     },
 
+    'encodes long strings': function(t) {
+        var s = "aaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccccccccccddddddddddddddddeeeeeeeeeeeeeeee";
+        t.equal(this.cut.encode(s), '"' + s + '"');
+        t.done();
+    },
+
+    'encodes utf8 strings': function(t) {
+        var s = "a\u0001b";
+        t.equal(this.cut.encode(s), '"a\\u0001b"');
+        t.done();
+    },
+
     'encodes arrays': function(t) {
         var a = [1, 2.5, "three", [4], null, undefined, 0, false, true, {a: 123}];
-        t.equal(JSON.stringify(a), this.cut.encode(a));
+        t.equal(this.cut.encode(a), JSON.stringify(a));
         t.done();
     },
 
     'encodes complex arrays': function(t) {
-        var data = [[1, 2, {x:1}], {a: 3, b: 4, c: [5,6,7]}];
+        var data = [[1, 2, {x:1}], {a: 3, b: 4, c: [5,6,7]}, function(){}];
         var json = this.cut.encode(data);
         t.equal(json, JSON.stringify(data));    // [[1,2,{"x":1}],{"a":3,"b":4,"c":[5,6,7]}]
         t.done();
@@ -81,7 +98,8 @@ module.exports = {
         var complex =
             [ 4, 5, 6, "hello", undefined,
               { a: 1, 'b': 2, '1': 3, 'if': 5, yes: true, no: false,
-                nan: NaN, infinity: Infinity, 'undefined': undefined, 'null': null },
+                nan: NaN, infinity: Infinity, 'undefined': undefined, 'null': null,
+                func: function(){} },
                 // function foo() { },                          -- not same
                 // /we$/gi,                                     -- not same
                 // new Date("Wed, 09 Aug 1995 00:00:00 GMT")    -- not same
@@ -154,11 +172,20 @@ module.exports = {
               "requestId" : "-"
         };
         var i, x;
+
+        console.time('json');
+        for (i=0; i<10000; i++) x = JSON.stringify(data);
+        console.timeEnd('json');
+
+        console.time('json-simple');
         for (i=0; i<10000; i++) x = this.cut.encode(data);
+        console.timeEnd('json-simple');
         //for (i=0; i<10000; i++) x = JSON.stringify(data);
         // 75ms for 10k encodes of 533B strings: 133k/s (vs JSON.stringify 103ms)
         // in production, throughput drops from 4.0k/s to 3.2k/s, ie 3.2k in .2 sec => 16k/s ?? (135k/s)
         // both JSON and json-simple, same thing
+        // json-simple is faster for node v0.10 through v5.8.0; slower for v6, tied for v8, slower for v9
+
         t.done();
     },
 };
