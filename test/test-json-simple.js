@@ -2,6 +2,49 @@
 
 var JsonSimple = require('../index');
 
+var logline = {
+      "name" : "MyApp",
+      "hostname" : "server",
+      "pid" : 22467,
+      "audit" : true,
+      "level" : "info",
+      "remoteAddress" : "127.0.0.1",
+      "remotePort" : 58539,
+      "req_id" : "-",
+      "req" : {
+        "method" : "GET",
+        "url" : "/healthcheck",
+        "headers" : {
+          "host" : "localhost:8888"
+        },
+        "httpVersion" : "1.1",
+        "trailers" : {
+        },
+        "version" : "1.0.0",
+        "timers" : {
+        }
+      },
+      "res" : {
+        "statusCode" : 200,
+        "trailer" : false
+      },
+      "rusage" : {
+        "utime" : 0,
+        "stime" : 0,
+        "wtime" : 0.00018252001609653234,
+        "maxrss" : 0,
+        "inblock" : 0,
+        "oublock" : 0
+      },
+      "query" : null,
+      "latency" : null,
+      "_audit" : true,
+      "msg" : "handled: 200",
+      "time" : "2015-01-15T05:04:55.114Z",
+      "v" : 0,
+      "requestId" : "-"
+};
+
 module.exports = {
     setUp: function(done) {
         this.cut = JsonSimple;
@@ -128,63 +171,37 @@ module.exports = {
         t.done();
     },
 
-    'test encode 10k loglines speed': function(t) {
-        var data = {
-              "name" : "MyApp",
-              "hostname" : "server",
-              "pid" : 22467,
-              "audit" : true,
-              "level" : "info",
-              "remoteAddress" : "127.0.0.1",
-              "remotePort" : 58539,
-              "req_id" : "-",
-              "req" : {
-                "method" : "GET",
-                "url" : "/healthcheck",
-                "headers" : {
-                  "host" : "localhost:8888"
-                },
-                "httpVersion" : "1.1",
-                "trailers" : {
-                },
-                "version" : "1.0.0",
-                "timers" : {
-                }
-              },
-              "res" : {
-                "statusCode" : 200,
-                "trailer" : false
-              },
-              "rusage" : {
-                "utime" : 0,
-                "stime" : 0,
-                "wtime" : 0.00018252001609653234,
-                "maxrss" : 0,
-                "inblock" : 0,
-                "oublock" : 0
-              },
-              "query" : null,
-              "latency" : null,
-              "_audit" : true,
-              "msg" : "handled: 200",
-              "time" : "2015-01-15T05:04:55.114Z",
-              "v" : 0,
-              "requestId" : "-"
-        };
+    'test encode 100k loglines speed': function(t) {
+        var data = logline;
         var i, x;
 
         console.time('json');
-        for (i=0; i<10000; i++) x = JSON.stringify(data);
+        for (i=0; i<100000; i++) x = JSON.stringify(data);
         console.timeEnd('json');
 
         console.time('json-simple');
-        for (i=0; i<10000; i++) x = this.cut.encode(data);
+        for (i=0; i<100000; i++) x = this.cut.encode(data);
         console.timeEnd('json-simple');
         //for (i=0; i<10000; i++) x = JSON.stringify(data);
         // 75ms for 10k encodes of 533B strings: 133k/s (vs JSON.stringify 103ms)
         // in production, throughput drops from 4.0k/s to 3.2k/s, ie 3.2k in .2 sec => 16k/s ?? (135k/s)
         // both JSON and json-simple, same thing
         // json-simple is faster for node v0.10 through v5.8.0; slower for v6, tied for v8, slower for v9
+
+        t.done();
+    },
+
+    'test decode 100k loglines speed': function(t) {
+        var data = JSON.stringify(logline);
+        var i, x;
+
+        console.time('json');
+        for (i=0; i<100000; i++) x = JSON.parse(data);
+        console.timeEnd('json');
+
+        console.time('json-simple');
+        for (i=0; i<100000; i++) x = this.cut.decode(data);
+        console.timeEnd('json-simple');
 
         t.done();
     },
